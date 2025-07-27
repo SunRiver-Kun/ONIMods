@@ -1,0 +1,3 @@
+title: "AutoMaterial" 
+description: "Auto select material for build. More setting in AutoMaterialConfig.json."
+staticID: "AutoMaterial" 
