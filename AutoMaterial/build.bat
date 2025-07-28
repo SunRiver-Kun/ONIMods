@@ -1,5 +1,6 @@
 dotnet build -c Release
-set OutPath=C:\Users\Administrator\Documents\Klei\OxygenNotIncluded\mods\Dev\AutoMaterial
+set OutPath=%USERPROFILE%\Documents\Klei\OxygenNotIncluded\mods\Dev\AutoMaterial
+if not exist "%OutPath%\" mkdir "%OutPath%"
 copy Readme.md %OutPath%
 cd AutoMaterial
 copy bin\Release\AutoMaterial.dll %OutPath%
