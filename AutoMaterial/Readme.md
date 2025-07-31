@@ -4,9 +4,9 @@ Auto select material for building when open menu.
 Total select rule:
 1. Find the rule in spBuildData, if not find auto choose in sortData by metrail(Common/Decoration)
 2. Exclude the disableMaterials, they will never be auto chosen.
-3. Check the count of sortData.materials is greater than enoughMass(baseMass*buildCount) for sequnece.
-4. If all not, check again to baseMass
-5. If all not, use all materials(not disableMaterials) to check for baseMass
+3. Check the count of sortData.materials is not less than enoughMass(baseMass*buildCount) for sequnece.
+4. If all not, select the max count of sortData.materials, no less than baseMass
+5. If all not, select the max count of all valid materials exclude disableMaterials
 6. If all not, use origin funcion. choose the first one or last one.
 
 AutoMaterialConfig.json
@@ -37,8 +37,8 @@ AutoMaterialConfig.json
 1. 在spBuildData里找建筑的材质选择规则，如果没找到根据材料类型在sortData里选择(Common/Decoration)
 2. 在材质列表里排除disableMaterials里标出的
 3. 按顺序判断materials里的材质数量是否大于等于enoughMass(baseMass*buildCount)
-4. 如果没找到，按顺序判断materials里的材质数量是否大于等于baseMass
-5. 如果还没找到，判断排除了disableMaterials的材质的数量是否大于等于baseMass
+4. 如果没找到，查找materials里最多的且数量大于等于baseMass的材质
+5. 如果还没找到，选择排除了disableMaterials后数量最多的材质
 6. 如果都没找到，会使用官方的函数，一般是选择第一个或者是上一个使用的。
 
 

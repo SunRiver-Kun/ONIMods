@@ -167,7 +167,7 @@ namespace AutoMaterial
 				return Tag.Invalid;
 			}
 
-			public static Tag MaxCountCheck(IEnumerable<Tag> materials)
+			public static Tag MaxCountCheck(IEnumerable<Tag> materials, float mass)
 			{
 				if (materials == null) { return Tag.Invalid; }
 
@@ -182,7 +182,7 @@ namespace AutoMaterial
 						maxCountMat = mat;
 					}
 				}
-				return maxCountMat;
+				return maxCount >= mass ? maxCountMat : Tag.Invalid;
 			}
 
 			public static void SelectMaterial(MaterialSelector inst, Recipe recipe, Tag tag)
@@ -289,11 +289,10 @@ namespace AutoMaterial
 					float mass = GetCompareMass(___activeRecipe, ___activeMass);
 					var checkMaterials = data.materials.FindAll((v) => materials.Contains(v));
 					Tag tag = EnoughCheck(checkMaterials, mass);
-					if (!tag.IsValid) { tag = EnoughCheck(checkMaterials, ___activeMass); }
-					if (!tag.IsValid) { tag = EnoughCheck(materials, ___activeMass); }
+					if (!tag.IsValid) { tag = MaxCountCheck(checkMaterials, ___activeMass); }
+					if (!tag.IsValid) { tag = MaxCountCheck(materials, 0); }
 
-					if(AutoMaterialMod.Ins.debug) { AutoMaterialMod.Log($"SortId: {sortId}\tEnoughMass: {mass}\tBaseMass: {___activeMass}");
- }
+					if(AutoMaterialMod.Ins.debug) { AutoMaterialMod.Log($"SortId: {sortId}\tEnoughMass: {mass}\tBaseMass: {___activeMass}"); }
 					if (tag.IsValid)
 					{
 						SelectMaterial(__instance, ___activeRecipe, tag);
