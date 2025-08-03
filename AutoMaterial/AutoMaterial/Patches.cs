@@ -61,12 +61,14 @@ namespace AutoMaterial
 	{
 		public List<Tag> materials = new List<Tag>();
 		public HashSet<Tag> disableMaterials = new HashSet<Tag>();
+
 	}
 
 	public class BuildData
 	{
 		public string sortType = "";
 		public int buildCount = 0;
+		public string subCheck = "";
 	}
 
 	public class MaterialSelectorPatches
@@ -121,6 +123,7 @@ namespace AutoMaterial
 					var data = new BuildData();
 					if(v["buildCount"] != null) { data.buildCount = (int)v["buildCount"]; }
 					if(v["sort"] != null) { data.sortType = (string)v["sort"]; }
+					if(v["subCheck"] != null) { data.subCheck = (string)v["subCheck"]; }
 					SpBuildData.Add(prop.Name, data);
 				}
 			}
@@ -262,6 +265,17 @@ namespace AutoMaterial
 				}
 				return mass;
 			}
+			
+			public static string GetSubCheck(Recipe recipe)
+			{
+				BuildData buildData;
+				if (SpBuildData.TryGetValue(recipe.Result, out buildData))
+				{
+					return buildData.subCheck != "" ? buildData.subCheck : "EnoughCheck" ; 
+				}
+
+				return "MaxCountCheck";
+			}
 
 			public static bool Prefix(MaterialSelector __instance, ref bool __result, Recipe ___activeRecipe, float ___activeMass)
 			{
@@ -289,10 +303,21 @@ namespace AutoMaterial
 					float mass = GetCompareMass(___activeRecipe, ___activeMass);
 					var checkMaterials = data.materials.FindAll((v) => materials.Contains(v));
 					Tag tag = EnoughCheck(checkMaterials, mass);
-					if (!tag.IsValid) { tag = MaxCountCheck(checkMaterials, ___activeMass); }
+					if (!tag.IsValid)
+					{
+						string subCheck = GetSubCheck(___activeRecipe);
+						if (subCheck == "EnoughCheck")
+						{
+							tag = EnoughCheck(checkMaterials, ___activeMass);
+						}
+						else
+						{
+							tag = MaxCountCheck(checkMaterials, ___activeMass);
+						}
+					}
 					if (!tag.IsValid) { tag = MaxCountCheck(materials, 0); }
 
-					if(AutoMaterialMod.Ins.debug) { AutoMaterialMod.Log($"SortId: {sortId}\tEnoughMass: {mass}\tBaseMass: {___activeMass}"); }
+					if (AutoMaterialMod.Ins.debug) { AutoMaterialMod.Log($"SortId: {sortId}\tEnoughMass: {mass}\tBaseMass: {___activeMass}\tsubCheck: {GetSubCheck(___activeRecipe)}"); }
 					if (tag.IsValid)
 					{
 						SelectMaterial(__instance, ___activeRecipe, tag);

@@ -5,7 +5,7 @@ Total select rule:
 1. Find the rule in spBuildData, if not find auto choose in sortData by metrail(Common/Decoration)
 2. Exclude the disableMaterials, they will never be auto chosen.
 3. Check the count of sortData.materials is not less than enoughMass(baseMass*buildCount) for sequnece.
-4. If all not, select the max count of sortData.materials, no less than baseMass
+4. If all not, select the max count of sortData.materials（MaxCountCheck）or the count of sortData.materials is not less than baseMass（EnoughCheck）
 5. If all not, select the max count of all valid materials exclude disableMaterials
 6. If all not, use origin funcion. choose the first one or last one.
 
@@ -28,8 +28,12 @@ AutoMaterialConfig.json
             "disableMaterials" : ["Fossil", "Ceramic", "Graphite", "Isoresin", "SuperInsulator"]
         },
     },
-    "spBuildData" : {   //Use special data for the build.
-        "Ladder": { "sort":"CommonRock", "buildCount": 50 },    //sort is in sortData, default by materials and decoration.   buildCount is to over massToBuildCount, default to auto seek.
+    "spBuildData" : {   
+        //Use special data for the build.
+        //sort is the key of sortData. optional, empty or not find for auto select default.
+        //buildCount is to over massToBuildCount. optional
+        //subCheck is EnoughCheck(default for spBuildData) or MaxCountCheck(default for other). optional
+        "Ladder": { "sort":"CommonRock", "buildCount": 50, subCheck:"EnoughCheck" }, 
     }
 }
 
@@ -37,7 +41,7 @@ AutoMaterialConfig.json
 1. 在spBuildData里找建筑的材质选择规则，如果没找到根据材料类型在sortData里选择(Common/Decoration)
 2. 在材质列表里排除disableMaterials里标出的
 3. 按顺序判断materials里的材质数量是否大于等于enoughMass(baseMass*buildCount)
-4. 如果没找到，查找materials里最多的且数量大于等于baseMass的材质
+4. 如果没找到，查找materials里最多的且数量大于等于baseMass的材质（MaxCountCheck）或者 顺序判断materials里的材质数量是否大于等于baseMass（EnoughCheck）
 5. 如果还没找到，选择排除了disableMaterials后数量最多的材质
 6. 如果都没找到，会使用官方的函数，一般是选择第一个或者是上一个使用的。
 
@@ -67,8 +71,11 @@ AutoMaterialConfig.json
         },
     },
                         
-    "spBuildData" : {   //标记特殊的建筑的选择规则                                 
-        "Ladder": { "sort":"CommonRock", "buildCount": 50 },    //sort在sortData里，默认根据装饰度和材质选择     buildCount是要建筑的数量，默认根据massToBuildCount来计算
+    "spBuildData" : {   //标记特殊的建筑的选择规则       
+        //sort在sortData里，默认根据装饰度和材质选择，可省略。如果不填或没找到会使用自动选择     
+        //buildCount是要建筑的数量，默认根据massToBuildCount来计算，可省略
+        //subCheck是 EnoughCheck（在spBuildData里的默认） 或 MaxCountCheck（其他默认），可省略
+        "Ladder": { "sort":"CommonRock", "buildCount": 50, subCheck:"EnoughCheck" },
     }
 }
 
@@ -109,7 +116,7 @@ Tag TempConductorSolid 导热质	220		0.62	2677	过热+900°C，导热强
 
 {	Metal
 Tag Copper			铜			60		0.38	1084	过热+50°C，装饰度+20%，导热强
-Tag SolidMercury	固态汞		8.3		0.14	-38		357  冷却或升温液体	
+Tag SolidMercury	固态汞		8.3		0.14	-38		常温液体	
 Tag Lead			铅			35		0.13	328		过热-20°C，导热强，热敏感，抗辐射
 Tag Cobalt			钴			100		0.42	1495	导热强
 Tag Iron			铁			55		0.45	1535	过热+50°C，导热强
@@ -135,7 +142,7 @@ Tag SolidResin		固态树液	0.17	1.3		20		隔热体，升温慢
 {
 Tag Polypropylene	塑料		0.15	1.92	160		隔热体，升温慢，抗辐射
 Tag HardPolypropylene 塑料质	0.25	1.5		1827	过热+900°C，隔热体，升温慢，抗辐射
-Tag SolidViscoGel 固态粘性凝胶	0.45	1.55	-30.6	 480   冷却或升温液体
+Tag SolidViscoGel 固态粘性凝胶	0.45	1.55	-30.6	常温液体	
 }
 
 <link="LADDER">梯子</link> Ladder

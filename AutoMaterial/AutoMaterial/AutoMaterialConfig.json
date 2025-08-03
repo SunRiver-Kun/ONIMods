@@ -10,7 +10,7 @@
     ],
     "sortData" : {
         "CommonRock": {
-            "materials": ["IgneousRock", "Shale", "SandStone", "Granite", "Obsidian", "SedimentaryRock", "WoodLog"],
+            "materials": ["IgneousRock", "Shale", "SandStone", "Granite", "Obsidian", "SedimentaryRock", "MaficRock", "WoodLog"],
             "disableMaterials" : ["Fossil", "Ceramic", "Graphite", "Isoresin", "SuperInsulator"]
         }, 
         "DecorationRock": {
@@ -35,23 +35,23 @@
         },
         "CommonMetal": {
             "materials": ["Lead", "Cobalt", "Nickel", "Aluminum", "Copper", "Gold", "Iron"],
-            "disableMaterials" : ["Steel", "Iridium", "Niobium", "DepletedUranium", "TempConductorSolid"]
+            "disableMaterials" : ["SolidMercury", "Steel", "Iridium", "Niobium", "DepletedUranium", "TempConductorSolid"]
         }, 
         "DecorationMetal": {
             "materials": ["Gold", "Copper", "Lead", "Cobalt", "Nickel", "Aluminum", "Iron"],
-            "disableMaterials" : ["Steel", "Iridium", "Niobium", "DepletedUranium", "TempConductorSolid"]
+            "disableMaterials" : ["SolidMercury", "Steel", "Iridium", "Niobium", "DepletedUranium", "TempConductorSolid"]
         }, 
         "MidTempMetal": {
             "materials": ["Copper", "Iron", "Gold",  "Steel", "Tungsten"],
-            "disableMaterials" : []
+            "disableMaterials" : ["SolidMercury"]
         }, 
         "HighTempMetal": {
             "materials": ["Steel", "Iridium", "Niobium", "TempConductorSolid"],
-            "disableMaterials" : []
+            "disableMaterials" : ["SolidMercury", "Lead"]
         },
         "SuperTempOreAndMetal": {
             "materials": ["TempConductorSolid", "Niobium", "Iridium", "Steel"],
-            "disableMaterials" : []
+            "disableMaterials" : ["SolidMercury", "Lead"]
         },
         "CommonTransparent": {
             "materials": ["Diamond", "Glass", "Amber", "NaturalSolidResin", "SolidResin"],
@@ -67,6 +67,11 @@
         "FirePole": { "sort":"CommonOre", "buildCount": 50 },
         "Tile": { "sort":"DecorationRock", "buildCount": 20 },
         "InsulationTile": { "sort":"CommonRock", "buildCount": 50 },
+
+        "Wire": { "sort":"CommonOre", "buildCount": 30 },
+        "HighWattageWire": { "sort":"CommonOre", "buildCount": 30 },
+        "WireRefined": { "sort":"CommonMetal", "buildCount": 30 },
+        "WireRefinedHighWattage": { "sort":"CommonMetal", "buildCount": 30 },
 
         "LiquidConduit": { "sort":"CommonRock", "buildCount": 30 },
         "InsulatedLiquidConduit": { "sort":"CommonRock", "buildCount": 20 },
