@@ -18,7 +18,7 @@
             "disableMaterials" : ["Fossil", "Ceramic", "Graphite", "Isoresin", "SuperInsulator"]
         },
         "CommonOre": {
-            "materials": ["Electrum", "Cinnabar", "Cobaltite", "NickelOre", "AluminumOre", "FoolsGold", "IronOre", "Cuprite"],
+            "materials": ["Electrum", "Cinnabar", "Cobaltite", "NickelOre", "AluminumOre", "FoolsGold", "Cuprite", "IronOre"],
             "disableMaterials" : ["Steel", "Iridium", "Niobium", "TempConductorSolid"]
         }, 
         "DecorationOre": {
@@ -72,6 +72,9 @@
         "HighWattageWire": { "sort":"CommonOre", "buildCount": 30 },
         "WireRefined": { "sort":"CommonMetal", "buildCount": 30 },
         "WireRefinedHighWattage": { "sort":"CommonMetal", "buildCount": 30 },
+        "WireBridgeHighWattage": { "sort":"CommonOre", "buildCount": 5 },
+        "PowerTransformerSmall": { "sort":"MidTempMetal", "buildCount": 1 },
+        "PowerTransformer": { "sort":"MidTempMetal", "buildCount": 1 },
 
         "LiquidConduit": { "sort":"CommonRock", "buildCount": 30 },
         "InsulatedLiquidConduit": { "sort":"CommonRock", "buildCount": 20 },
@@ -83,6 +86,7 @@
 
         "NuclearResearchCenter": { "sort":"MidTempMetal" },
         "LiquidConditioner": { "sort":"SuperTempOreAndMetal" },
+        "LiquidHeater": { "sort":"SuperTempOreAndMetal" },
         
         "LogicPressureSensorGas": { "sort":"MidTempMetal" },
         "LogicPressureSensorLiquid": { "sort":"MidTempMetal" },

@@ -6,7 +6,6 @@ using UnityEngine;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using KMod;
-using TUNING;
 
 namespace AutoMaterial
 {
@@ -138,6 +137,8 @@ namespace AutoMaterial
 		[HarmonyPatch(typeof(MaterialSelector), nameof(MaterialSelector.AutoSelectAvailableMaterial))]
 		public class AutoSelectAvailableMaterial
 		{
+			const float SubMassScale = 4;
+
 			static Dictionary<Tag, float> tempCount = new Dictionary<Tag, float>();
 
 			private static void ClearMatCountCache()
@@ -305,14 +306,15 @@ namespace AutoMaterial
 					Tag tag = EnoughCheck(checkMaterials, mass);
 					if (!tag.IsValid)
 					{
+						float subMass = Math.Min(mass, SubMassScale * ___activeMass);
 						string subCheck = GetSubCheck(___activeRecipe);
 						if (subCheck == "EnoughCheck")
 						{
-							tag = EnoughCheck(checkMaterials, ___activeMass);
+							tag = EnoughCheck(checkMaterials, subMass);
 						}
 						else
 						{
-							tag = MaxCountCheck(checkMaterials, ___activeMass);
+							tag = MaxCountCheck(checkMaterials, subMass);
 						}
 					}
 					if (!tag.IsValid) { tag = MaxCountCheck(materials, 0); }
