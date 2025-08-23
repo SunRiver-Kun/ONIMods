@@ -12,6 +12,7 @@ namespace AutoMaterial {
 		public static bool debug = false;
 		public static bool ignoreCopyMaterial = true;
 		public static bool autoUseLeadForCommon = true;
+		public static bool autoChangeMidTempToHigh = true;
 		public static bool isOriginCopy = false;
 		public static HashSet<Tag> copyTags = new HashSet<Tag>();
 		public static int curHeadIndex = 0;
@@ -42,6 +43,7 @@ namespace AutoMaterial {
 			debug = (bool)json["debug"];
 			ignoreCopyMaterial = (bool)json["ignoreCopyMaterial"];
 			autoUseLeadForCommon = (bool)json["autoUseLeadForCommon"];
+			autoChangeMidTempToHigh = (bool)json["autoChangeMidTempToHigh"];
 
 			foreach (var v in json["sortHeads"]) { sortHeads.Add((string)v); }
 			if (sortHeads.Count == 0) { sortHeads.Add("Common"); }
@@ -220,6 +222,13 @@ namespace AutoMaterial {
 				BuildData buildData = null;
 				if (SpBuildData.TryGetValue(recipe.Result, out buildData) && SortData.TryGetValue(buildData.sortType, out data)) {
 					sortType = buildData.sortType;
+					if (_M.autoChangeMidTempToHigh && _M.curSortHead == "HighTemp" && sortType.IndexOf("MidTemp")>=0) {
+						var changeSortType = sortType.Replace("MidTemp", "HighTemp");
+						if (SortData.ContainsKey(changeSortType)) {
+							sortType = changeSortType;
+							data = SortData[changeSortType];
+						}
+					}
 					return data;
 				}
 

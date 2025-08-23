@@ -2,6 +2,7 @@
     "debug" : true,
     "ignoreCopyMaterial" : true,
     "autoUseLeadForCommon" : true,
+    "autoChangeMidTempToHigh" : true,
     "massToBuildCount" : [
         { "mass": 5, "buildCount": 100 }, 
         { "mass": 25, "buildCount": 50 }, 
@@ -110,7 +111,7 @@
         "WireRefined": { "sort":"CommonMetal", "buildCount": 30 },
         "WireRefinedHighWattage": { "sort":"CommonMetal", "buildCount": 30 },
         "WireBridgeHighWattage": { "sort":"CommonOre", "buildCount": 5 },
-        "PowerTransformerSmall": { "sort":"MidTempMetal", "buildCount": 1 },
+        "PowerTransformerSmall": { "sort":"MidTempOre", "buildCount": 1 },
         "PowerTransformer": { "sort":"MidTempMetal", "buildCount": 1 },
 
         "LiquidConduit": { "buildCount": 30 },
