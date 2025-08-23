@@ -11,6 +11,7 @@ namespace AutoMaterial {
 	public class _M : UserMod2 {
 		public static bool debug = false;
 		public static bool ignoreCopyMaterial = true;
+		public static bool autoUseLeadForCommon = true;
 		public static bool isOriginCopy = false;
 		public static HashSet<Tag> copyTags = new HashSet<Tag>();
 		public static int curHeadIndex = 0;
@@ -24,12 +25,12 @@ namespace AutoMaterial {
 
 		public static bool isHotKeyDown(string name) {
 			List<string> keys;
-			if (!hotKeys.TryGetValue(name, out keys) || keys.Count<=0) { return false; }
+			if (!hotKeys.TryGetValue(name, out keys) || keys.Count <= 0) { return false; }
 
 			foreach (string k in keys) {
 				bool isKeepKey = k.IndexOf("shift") >= 0 || k.IndexOf("ctrl") >= 0 || k.IndexOf("alt") >= 0;
 				bool isInput = isKeepKey ? Input.GetKey(k) : Input.GetKeyDown(k);
-				if(!isInput) { return false; }
+				if (!isInput) { return false; }
 			}
 			return true;
 		}
@@ -40,6 +41,7 @@ namespace AutoMaterial {
 
 			debug = (bool)json["debug"];
 			ignoreCopyMaterial = (bool)json["ignoreCopyMaterial"];
+			autoUseLeadForCommon = (bool)json["autoUseLeadForCommon"];
 
 			foreach (var v in json["sortHeads"]) { sortHeads.Add((string)v); }
 			if (sortHeads.Count == 0) { sortHeads.Add("Common"); }
@@ -284,6 +286,13 @@ namespace AutoMaterial {
 
 					float mass = GetCompareMass(___activeRecipe, ___activeMass);
 					var checkMaterials = data.materials.FindAll((v) => materials.Contains(v));
+					if (_M.autoUseLeadForCommon && sortId == "CommonMetal" && materials.Contains("Lead")) {
+						var buildDef = ___activeRecipe.GetBuildingDef();
+						if (buildDef && (!buildDef.Overheatable || buildDef.OverheatTemperature > 273.15 + 125)) {
+							checkMaterials.Insert(0, "Lead");
+						}
+					}
+
 					Tag tag = EnoughCheck(checkMaterials, mass);
 					if (!tag.IsValid) {
 						float subMass = Math.Min(mass, SubMassScale * ___activeMass);

@@ -1,6 +1,7 @@
 {
     "debug" : true,
     "ignoreCopyMaterial" : true,
+    "autoUseLeadForCommon" : true,
     "massToBuildCount" : [
         { "mass": 5, "buildCount": 100 }, 
         { "mass": 25, "buildCount": 50 }, 
@@ -24,6 +25,10 @@
             "materials": ["Granite", "SandStone", "IgneousRock", "Shale", "Obsidian", "SedimentaryRock", "WoodLog"],
             "disableMaterials" : ["Fossil", "Ceramic", "Graphite", "Isoresin", "SuperInsulator"]
         },
+        "InsulationRock": {
+            "materials": ["IgneousRock", "MaficRock", "SuperInsulator", "Ceramic", "Fossil", "Isoresin"],
+            "disableMaterials" : ["SandStone", "Granite", "Graphite", "SedimentaryRock", "Obsidian"]
+        }, 
         "MidTempRock": {
             "materials": ["IgneousRock", "Obsidian", "MaficRock", "Fossil", "Shale", "SandStone", "Granite", "SedimentaryRock", "WoodLog"],
             "disableMaterials" : ["Ceramic", "Graphite", "Isoresin", "SuperInsulator", "WoodLog"]
@@ -40,6 +45,10 @@
             "materials": ["Cuprite", "Electrum", "Cinnabar", "Cobaltite", "NickelOre", "FoolsGold", "IronOre", "AluminumOre"],
             "disableMaterials" : ["Steel", "Iridium", "Niobium", "TempConductorSolid"]
         }, 
+        "ConduitRadiantOre": {
+            "materials": ["Electrum", "Cinnabar", "Cobaltite", "NickelOre", "FoolsGold", "Cuprite", "IronOre", "AluminumOre"],
+            "disableMaterials" : ["Steel", "Iridium", "Niobium", "TempConductorSolid"]
+        }, 
         "MidTempOre": {
             "materials": ["GoldAmalgam", "Steel", "Iridium", "Niobium"],
             "disableMaterials" : []
@@ -49,12 +58,16 @@
             "disableMaterials" : []
         },
         "CommonMetal": {
-            "materials": ["Lead", "Cobalt", "Nickel", "Aluminum", "Copper", "Gold", "Iron"],
+            "materials": ["Cobalt", "Nickel", "Aluminum", "Copper", "Gold", "Iron"],
             "disableMaterials" : ["SolidMercury", "Steel", "Iridium", "Niobium", "DepletedUranium", "TempConductorSolid"]
         }, 
         "DecorationMetal": {
             "materials": ["Gold", "Copper", "Lead", "Cobalt", "Nickel", "Aluminum", "Iron"],
             "disableMaterials" : ["SolidMercury", "Steel", "Iridium", "Niobium", "DepletedUranium", "TempConductorSolid"]
+        }, 
+        "ConduitRadiantMetal": {
+            "materials": ["Aluminum", "TempConductorSolid", "Iridium", "Cobalt", "Nickel", "Copper", "Gold", "Iron", "Steel", "Niobium"],
+            "disableMaterials" : ["SolidMercury", "Lead", "DepletedUranium"]
         }, 
         "MidTempMetal": {
             "materials": ["Copper", "Iron", "Gold",  "Steel", "Tungsten"],
@@ -90,7 +103,7 @@
         "Ladder": { "buildCount": 50 },
         "FirePole": { "buildCount": 50 },
         "Tile": {"buildCount": 20 },
-        "InsulationTile": { "buildCount": 20 },
+        "InsulationTile": { "sort":"InsulationRock", "buildCount": 20 },
 
         "Wire": { "sort":"CommonOre", "buildCount": 30 },
         "HighWattageWire": { "sort":"CommonOre", "buildCount": 30 },
@@ -99,34 +112,16 @@
         "WireBridgeHighWattage": { "sort":"CommonOre", "buildCount": 5 },
         "PowerTransformerSmall": { "sort":"MidTempMetal", "buildCount": 1 },
         "PowerTransformer": { "sort":"MidTempMetal", "buildCount": 1 },
-        "CommonMetal": { "sort":"MidTempMetal", "buildCount": 1 },
 
         "LiquidConduit": { "buildCount": 30 },
         "InsulatedLiquidConduit": { "buildCount": 20 },
-        "LiquidConduitRadiant": { "buildCount": 5 },
+        "LiquidConduitRadiant": { "sort":"ConduitRadiantMetal", "buildCount": 5 },
         
         "GasConduitBridge": { "buildCount": 30 },
         "InsulatedGasConduit": { "buildCount": 20 },
-        "GasConduitRadiant": { "buildCount": 5 },
+        "GasConduitRadiant": { "sort": "ConduitRadiantOre", "buildCount": 5 },
 
-        "NuclearResearchCenter": { "sort":"MidTempMetal" },
         "LiquidConditioner": { "sort":"SuperTempOreAndMetal" },
-        "LiquidHeater": { "sort":"SuperTempOreAndMetal" },
-        
-        "SolidTransferArm": { "sort":"MidTempMetal" },
-        "SolidConduitInbox": { "sort":"MidTempMetal" },
-        "AutoMiner": { "sort":"MidTempMetal" },
-
-        "LogicPressureSensorGas": { "sort":"MidTempMetal" },
-        "LogicPressureSensorLiquid": { "sort":"MidTempMetal" },
-        "LogicTemperatureSensor": { "sort":"HighTempMetal" },
-
-        "LogicElementSensorGas": { "sort":"MidTempMetal" },
-        "LogicRadiationSensor": { "sort":"MidTempMetal" },
-        "LogicElementSensorLiquid": { "sort":"MidTempMetal" },
-        "LogicHEPSensor": { "sort":"MidTempMetal" },
-        "CometDetector": { "sort":"MidTempMetal" },
-        "SolidConduitElementSensor": { "sort":"MidTempMetal" },
-        "SolidConduitTemperatureSensor": { "sort":"MidTempMetal" }
+        "LiquidHeater": { "sort":"SuperTempOreAndMetal" }
     }
 }
