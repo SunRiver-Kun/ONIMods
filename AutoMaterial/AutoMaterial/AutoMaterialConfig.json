@@ -6,8 +6,10 @@
         { "mass": 25, "buildCount": 50 }, 
         { "mass": 50, "buildCount": 25 }, 
         { "mass": 100, "buildCount": 4 }, 
-        { "mass": 200, "buildCount": 2 }
+        { "mass": 200, "buildCount": 4 },
+        { "mass": 400, "buildCount": 4 }
     ],
+    "sortHeads": ["Common", "MidTemp", "HighTemp"],
     "sortData" : {
         "CommonRock": {
             "materials": ["IgneousRock", "Shale", "SandStone", "Granite", "Obsidian", "SedimentaryRock", "MaficRock", "WoodLog"],
@@ -17,12 +19,20 @@
             "materials": ["Granite", "SandStone", "IgneousRock", "Shale", "Obsidian", "SedimentaryRock", "WoodLog"],
             "disableMaterials" : ["Fossil", "Ceramic", "Graphite", "Isoresin", "SuperInsulator"]
         },
+        "MidTempRock": {
+            "materials": ["IgneousRock", "Obsidian", "MaficRock", "Fossil", "Shale", "SandStone", "Granite", "SedimentaryRock", "WoodLog"],
+            "disableMaterials" : ["Ceramic", "Graphite", "Isoresin", "SuperInsulator", "WoodLog"]
+        }, 
+        "HighTempRock": {
+            "materials": ["SuperInsulator", "Ceramic", "Obsidian", "IgneousRock", "MaficRock", "Fossil", "Shale", "SandStone", "Granite", "SedimentaryRock"],
+            "disableMaterials" : ["Graphite", "Isoresin", "WoodLog"]
+        }, 
         "CommonOre": {
-            "materials": ["Electrum", "Cinnabar", "Cobaltite", "NickelOre", "AluminumOre", "FoolsGold", "Cuprite", "IronOre"],
+            "materials": ["Electrum", "Cinnabar", "Cobaltite", "NickelOre", "FoolsGold", "Cuprite", "IronOre", "AluminumOre"],
             "disableMaterials" : ["Steel", "Iridium", "Niobium", "TempConductorSolid"]
         }, 
         "DecorationOre": {
-            "materials": ["Cuprite", "Electrum", "Cinnabar", "Cobaltite", "NickelOre", "AluminumOre", "FoolsGold", "IronOre"],
+            "materials": ["Cuprite", "Electrum", "Cinnabar", "Cobaltite", "NickelOre", "FoolsGold", "IronOre", "AluminumOre"],
             "disableMaterials" : ["Steel", "Iridium", "Niobium", "TempConductorSolid"]
         }, 
         "MidTempOre": {
@@ -60,13 +70,22 @@
         "DecorationTransparent": {
             "materials": ["Diamond", "Glass", "Amber", "NaturalSolidResin", "SolidResin"],
             "disableMaterials" : []
+        },
+        "MidTempTransparent": {
+            "materials": ["Diamond", "Glass"],
+            "disableMaterials" : ["Amber", "NaturalSolidResin", "SolidResin"]
+        }, 
+        "HighTempTransparent": {
+            "materials": ["Diamond", "Glass"],
+            "disableMaterials" : ["Amber", "NaturalSolidResin", "SolidResin"]
         }
     },
     "spBuildData" : {
-        "Ladder": { "sort":"CommonRock", "buildCount": 50 },
-        "FirePole": { "sort":"CommonOre", "buildCount": 50 },
-        "Tile": { "sort":"DecorationRock", "buildCount": 20 },
-        "InsulationTile": { "sort":"CommonRock", "buildCount": 50 },
+        "ExteriorWall": { "buildCount": 50 },
+        "Ladder": { "buildCount": 50 },
+        "FirePole": { "buildCount": 50 },
+        "Tile": {"buildCount": 20 },
+        "InsulationTile": { "buildCount": 20 },
 
         "Wire": { "sort":"CommonOre", "buildCount": 30 },
         "HighWattageWire": { "sort":"CommonOre", "buildCount": 30 },
@@ -75,19 +94,24 @@
         "WireBridgeHighWattage": { "sort":"CommonOre", "buildCount": 5 },
         "PowerTransformerSmall": { "sort":"MidTempMetal", "buildCount": 1 },
         "PowerTransformer": { "sort":"MidTempMetal", "buildCount": 1 },
+        "CommonMetal": { "sort":"MidTempMetal", "buildCount": 1 },
 
-        "LiquidConduit": { "sort":"CommonRock", "buildCount": 30 },
-        "InsulatedLiquidConduit": { "sort":"CommonRock", "buildCount": 20 },
-        "LiquidConduitRadiant": { "sort":"CommonMetal", "buildCount": 5 },
+        "LiquidConduit": { "buildCount": 30 },
+        "InsulatedLiquidConduit": { "buildCount": 20 },
+        "LiquidConduitRadiant": { "buildCount": 5 },
         
-        "GasConduitBridge": { "sort":"CommonRock", "buildCount": 30 },
-        "InsulatedGasConduit": { "sort":"CommonRock", "buildCount": 20 },
-        "GasConduitRadiant": { "sort":"CommonOre", "buildCount": 5 },
+        "GasConduitBridge": { "buildCount": 30 },
+        "InsulatedGasConduit": { "buildCount": 20 },
+        "GasConduitRadiant": { "buildCount": 5 },
 
         "NuclearResearchCenter": { "sort":"MidTempMetal" },
         "LiquidConditioner": { "sort":"SuperTempOreAndMetal" },
         "LiquidHeater": { "sort":"SuperTempOreAndMetal" },
         
+        "SolidTransferArm": { "sort":"MidTempMetal" },
+        "SolidConduitInbox": { "sort":"MidTempMetal" },
+        "AutoMiner": { "sort":"MidTempMetal" },
+
         "LogicPressureSensorGas": { "sort":"MidTempMetal" },
         "LogicPressureSensorLiquid": { "sort":"MidTempMetal" },
         "LogicTemperatureSensor": { "sort":"HighTempMetal" },

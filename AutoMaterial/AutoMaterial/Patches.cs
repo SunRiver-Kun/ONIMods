@@ -7,71 +7,74 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using KMod;
 
-namespace AutoMaterial
-{
-	public class AutoMaterialMod : UserMod2
-	{
-		public static AutoMaterialMod Ins;
-		public bool debug = false;
-		public bool ignoreCopyMaterial = true;
-		public override void OnLoad(Harmony harmony)
-		{
+namespace AutoMaterial {
+	public class _M : UserMod2 {
+		public static bool debug = false;
+		public static bool ignoreCopyMaterial = true;
+		public static bool isOriginCopy = false;
+		public static HashSet<Tag> copyTags = new HashSet<Tag>();
+		public static int curHeadIndex = 0;
+		public static List<string> sortHeads = new List<string>();
+		public static string curSortHead => sortHeads[curHeadIndex];
+		public static void AddToCopyTags(Tag tag) {
+			if (!tag.IsValid) { return; }
+			copyTags.Add(tag);
+		}
 
-			Ins = this;
+		public override void OnLoad(Harmony harmony) {
 			JObject json = this.GetJson();
 			if (json == null) { return; }
 
 			debug = (bool)json["debug"];
 			ignoreCopyMaterial = (bool)json["ignoreCopyMaterial"];
 
+			foreach (var v in json["sortHeads"]) { sortHeads.Add((string)v); }
+			if (sortHeads.Count == 0) { sortHeads.Add("Common"); }
+
 			MaterialSelectorPatches.Init(json);
 			base.OnLoad(harmony);
 		}
 
-		public JObject GetJson()
-		{
+		public JObject GetJson() {
 			JObject result = null;
 			string path = Path.Combine(this.path, "AutoMaterialConfig.json");
-			if (File.Exists(path))
-			{
+			if (File.Exists(path)) {
 				string jsonString = File.ReadAllText(path);
 				result = JsonConvert.DeserializeObject<JObject>(jsonString);
-			}
-			else
-			{
+			} else {
 				File.Create(path).Dispose();
 				LogError("Create new file in path of " + path);
 			}
 			return result;
 		}
 
-		public static void LogError(string str)
-		{
+		public static void LogError(string str) {
 			Debug.Log("[AutoMaterial][ERROR]: " + str);
 		}
 
-		public static void Log(string str)
-		{
+		public static void Log(string str) {
 			Debug.Log("[AutoMaterial]: " + str);
+		}
+
+		public static void ShowTip(string str) {
+			PopFXManager.Instance.SpawnFX(PopFXManager.Instance.sprite_Resource, str, null, Camera.main.ScreenToWorldPoint(KInputManager.GetMousePos()));
 		}
 	}
 
-	public class SortData
-	{
+	#region 选择相关
+	public class SortData {
 		public List<Tag> materials = new List<Tag>();
 		public HashSet<Tag> disableMaterials = new HashSet<Tag>();
 
 	}
 
-	public class BuildData
-	{
+	public class BuildData {
 		public string sortType = "";
 		public int buildCount = 0;
 		public string subCheck = "";
 	}
 
-	public class MaterialSelectorPatches
-	{
+	public class MaterialSelectorPatches {
 		public static List<KeyValuePair<float, int>> MassToBuildCount = new List<KeyValuePair<float, int>>();
 		public static Dictionary<string, SortData> SortData = new Dictionary<string, SortData>();
 		public static Dictionary<Tag, BuildData> SpBuildData = new Dictionary<Tag, BuildData>();
@@ -84,104 +87,83 @@ namespace AutoMaterial
 			{"Transparent", "Transparent"},
 		};
 
-		public static void Init(JObject json)
-		{
-			try
-			{
-				foreach (var v in json["massToBuildCount"])
-				{
+		public static void Init(JObject json) {
+			try {
+				foreach (var v in json["massToBuildCount"]) {
 					MassToBuildCount.Add(new KeyValuePair<float, int>((float)v["mass"], (int)v["buildCount"]));
 				}
 				MassToBuildCount.Sort((a, b) => a.Key.CompareTo(b.Key));
 
-				foreach (JProperty prop in json["sortData"])
-				{
+				foreach (JProperty prop in json["sortData"]) {
 					var v = prop.Value;
 					var data = new SortData();
 					SortData.Add(prop.Name, data);
 
-					if (v["materials"] != null)
-					{
-						foreach (var mat in v["materials"])
-						{
+					if (v["materials"] != null) {
+						foreach (var mat in v["materials"]) {
 							data.materials.Add((string)mat);
 						}
 					}
-					if (v["disableMaterials"] != null)
-					{
-						foreach (var mat in v["disableMaterials"])
-						{
+					if (v["disableMaterials"] != null) {
+						foreach (var mat in v["disableMaterials"]) {
 							data.disableMaterials.Add((string)mat);
 						}
 					}
 				}
 
-				foreach (JProperty prop in json["spBuildData"])
-				{
+				foreach (JProperty prop in json["spBuildData"]) {
 					var v = prop.Value;
 					var data = new BuildData();
-					if(v["buildCount"] != null) { data.buildCount = (int)v["buildCount"]; }
-					if(v["sort"] != null) { data.sortType = (string)v["sort"]; }
-					if(v["subCheck"] != null) { data.subCheck = (string)v["subCheck"]; }
+					if (v["buildCount"] != null) { data.buildCount = (int)v["buildCount"]; }
+					if (v["sort"] != null) { data.sortType = (string)v["sort"]; }
+					if (v["subCheck"] != null) { data.subCheck = (string)v["subCheck"]; }
 					SpBuildData.Add(prop.Name, data);
 				}
-			}
-			catch (Exception e)
-			{
-				AutoMaterialMod.LogError("AutoMaterialConfig has some error. " + e.ToString());
+			} catch (Exception e) {
+				_M.LogError("AutoMaterialConfig has some error. " + e.ToString());
 				throw e;
 			}
 		}
 
 		//------------------------------------------------------------------
 		[HarmonyPatch(typeof(MaterialSelector), nameof(MaterialSelector.AutoSelectAvailableMaterial))]
-		public class AutoSelectAvailableMaterial
-		{
+		public class AutoSelectAvailableMaterial {
 			const float SubMassScale = 4;
 
 			static Dictionary<Tag, float> tempCount = new Dictionary<Tag, float>();
 
-			private static void ClearMatCountCache()
-			{
+			private static void ClearMatCountCache() {
 				tempCount.Clear();
 			}
 
-			private static float GetMatCount(Tag mat)
-			{
+			private static float GetMatCount(Tag mat) {
 				float count;
-				if (!tempCount.TryGetValue(mat, out count))
-				{
+				if (!tempCount.TryGetValue(mat, out count)) {
 					count = ClusterManager.Instance.activeWorld.worldInventory.GetAmount(mat, true);
 					tempCount.Add(mat, count);
 				}
 				return count;
 			}
 
-			public static Tag EnoughCheck(IEnumerable<Tag> materials, float mass)
-			{
+			public static Tag EnoughCheck(IEnumerable<Tag> materials, float mass) {
 				if (materials == null) { return Tag.Invalid; }
 
-				foreach (var mat in materials)
-				{
-					if (GetMatCount(mat) >= mass)
-					{
+				foreach (var mat in materials) {
+					if (GetMatCount(mat) >= mass) {
 						return mat;
 					}
 				}
 				return Tag.Invalid;
 			}
 
-			public static Tag MaxCountCheck(IEnumerable<Tag> materials, float mass)
-			{
+			public static Tag MaxCountCheck(IEnumerable<Tag> materials, float mass) {
 				if (materials == null) { return Tag.Invalid; }
 
 				Tag maxCountMat = Tag.Invalid;
 				float maxCount = 0;
-				foreach (var mat in materials)
-				{
+				foreach (var mat in materials) {
 					var count = GetMatCount(mat);
-					if (count > maxCount)
-					{
+					if (count > maxCount) {
 						maxCount = count;
 						maxCountMat = mat;
 					}
@@ -189,44 +171,30 @@ namespace AutoMaterial
 				return maxCount >= mass ? maxCountMat : Tag.Invalid;
 			}
 
-			public static void SelectMaterial(MaterialSelector inst, Recipe recipe, Tag tag)
-			{
+			public static void SelectMaterial(MaterialSelector inst, Recipe recipe, Tag tag) {
 				UISounds.PlaySound(UISounds.Sound.Object_AutoSelected);
 
-				var copyTag = MaterialSelectorPanelPatches.copyTag;
-				if (copyTag.IsValid && copyTag != tag)
-				{
+				if (_M.copyTags.Count>0 && !_M.copyTags.Contains(tag)) {
 					Element element = ElementLoader.GetElement(tag);
 					string str;
-					if (element == null)
-					{
+					if (element == null) {
 						GameObject prefab = Assets.GetPrefab(tag);
 						str = prefab != null ? prefab.GetProperName() : tag.Name;
-					}
-					else
-					{
+					} else {
 						str = element.name;
 					}
-
-					PopFXManager.Instance.SpawnFX(
-						PopFXManager.Instance.sprite_Resource,
-						string.Format((string)STRINGS.MISC.POPFX.RESOURCE_SELECTION_CHANGED, str),
-						null,
-						Camera.main.ScreenToWorldPoint(KInputManager.GetMousePos())
-					);
+					_M.ShowTip(string.Format((string)STRINGS.MISC.POPFX.RESOURCE_SELECTION_CHANGED, str));
 				}
 
 				inst.OnSelectMaterial(tag, recipe, true);
 			}
 
-			public static SortData TryGetSortData(Recipe recipe, out string sortType)
-			{
+			public static SortData TryGetSortData(Recipe recipe, out string sortType) {
 				//Json
 				sortType = "";
 				SortData data = null;
 				BuildData buildData = null;
-				if (SpBuildData.TryGetValue(recipe.Result, out buildData) && SortData.TryGetValue(buildData.sortType, out data))
-				{
+				if (SpBuildData.TryGetValue(recipe.Result, out buildData) && SortData.TryGetValue(buildData.sortType, out data)) {
 					sortType = buildData.sortType;
 					return data;
 				}
@@ -235,68 +203,59 @@ namespace AutoMaterial
 				var buildDef = recipe.GetBuildingDef();
 				if (!(buildDef != null && buildDef.MaterialCategory != null)) { return null; }
 
-				foreach (var v in buildDef.MaterialCategory)
-				{
-					foreach (var cate in v.Split('&'))
-					{
-						if (CategoryToSortPostName.TryGetValue(cate, out sortType))
-						{
-							sortType = (buildDef.BaseDecor > 0 ? "Decoration" : "Common") + sortType;
+				string head = _M.curSortHead;
+				string commonHead = buildDef.BaseDecor > 0 ? "Decoration" : "Common";
+				if (head == "Common") { head = commonHead; }
+
+				string postName = "";
+				foreach (var v in buildDef.MaterialCategory) {
+					foreach (var cate in v.Split('&')) {
+						if (CategoryToSortPostName.TryGetValue(cate, out postName)) {
+							sortType = head + postName;
 							if (SortData.TryGetValue(sortType, out data)) { return data; }
+
+							sortType = commonHead + postName;
+							if (SortData.TryGetValue(sortType, out data)) { }
 						}
 					}
 				}
-				return null;
+				return data;
 			}
 
-			public static float GetCompareMass(Recipe recipe, float mass)
-			{
+			public static float GetCompareMass(Recipe recipe, float mass) {
 				BuildData buildData;
-				if (SpBuildData.TryGetValue(recipe.Result, out buildData) && buildData.buildCount>0)
-				{
+				if (SpBuildData.TryGetValue(recipe.Result, out buildData) && buildData.buildCount > 0) {
 					return mass * buildData.buildCount;
 				}
 
-				foreach (var kv in MassToBuildCount)
-				{
-					if (mass <= kv.Key)
-					{
+				foreach (var kv in MassToBuildCount) {
+					if (mass <= kv.Key) {
 						return mass * kv.Value;
 					}
 				}
 				return mass;
 			}
-			
-			public static string GetSubCheck(Recipe recipe)
-			{
+
+			public static string GetSubCheck(Recipe recipe) {
 				BuildData buildData;
-				if (SpBuildData.TryGetValue(recipe.Result, out buildData))
-				{
-					return buildData.subCheck != "" ? buildData.subCheck : "EnoughCheck" ; 
+				if (SpBuildData.TryGetValue(recipe.Result, out buildData)) {
+					return buildData.subCheck != "" ? buildData.subCheck : "EnoughCheck";
 				}
 
 				return "MaxCountCheck";
 			}
 
-			public static bool Prefix(MaterialSelector __instance, ref bool __result, Recipe ___activeRecipe, float ___activeMass)
-			{
+			public static bool Prefix(MaterialSelector __instance, ref bool __result, Recipe ___activeRecipe, float ___activeMass) {
 				if (___activeRecipe == null || __instance.ElementToggles.Count == 0) { return true; }
-
-				if (AutoMaterialMod.Ins.debug)
-				{
-					AutoMaterialMod.Log("buildId, buildName: " + ___activeRecipe.Result + "\t" + ___activeRecipe.Name);
-				}
+				if (_M.debug) { _M.Log("buildId, buildName: " + ___activeRecipe.Result + "\t" + ___activeRecipe.Name); }
 
 				ClearMatCountCache();
 				string sortId;
 				SortData data = TryGetSortData(___activeRecipe, out sortId);
-				if (data != null)
-				{
+				if (data != null) {
 					HashSet<Tag> materials = new HashSet<Tag>();
-					foreach (var mat in __instance.ElementToggles.Keys)
-					{
-						if (!data.disableMaterials.Contains(mat))
-						{
+					foreach (var mat in __instance.ElementToggles.Keys) {
+						if (!data.disableMaterials.Contains(mat)) {
 							materials.Add(mat);
 						}
 					}
@@ -304,73 +263,67 @@ namespace AutoMaterial
 					float mass = GetCompareMass(___activeRecipe, ___activeMass);
 					var checkMaterials = data.materials.FindAll((v) => materials.Contains(v));
 					Tag tag = EnoughCheck(checkMaterials, mass);
-					if (!tag.IsValid)
-					{
+					if (!tag.IsValid) {
 						float subMass = Math.Min(mass, SubMassScale * ___activeMass);
 						string subCheck = GetSubCheck(___activeRecipe);
-						if (subCheck == "EnoughCheck")
-						{
+						if (subCheck == "EnoughCheck") {
 							tag = EnoughCheck(checkMaterials, subMass);
-						}
-						else
-						{
+						} else {
 							tag = MaxCountCheck(checkMaterials, subMass);
 						}
 					}
 					if (!tag.IsValid) { tag = MaxCountCheck(materials, 0); }
 
-					if (AutoMaterialMod.Ins.debug) { AutoMaterialMod.Log($"SortId: {sortId}\tEnoughMass: {mass}\tBaseMass: {___activeMass}\tsubCheck: {GetSubCheck(___activeRecipe)}"); }
-					if (tag.IsValid)
-					{
+					if (_M.debug) { _M.Log($"SortId: {sortId}\tEnoughMass: {mass}\tBaseMass: {___activeMass}\tsubCheck: {GetSubCheck(___activeRecipe)}"); }
+					if (tag.IsValid) {
 						SelectMaterial(__instance, ___activeRecipe, tag);
 						__result = true;
 						return false;
 					}
+				} else {
+					if (_M.debug) { _M.Log($"not find sortType {___activeRecipe.Name}, {_M.curSortHead};"); }
 				}
 
 				return true;
 			}
 		}
 	}
-
-	public class MaterialSelectorPanelPatches
-	{
-		public static Tag copyTag = Tag.Invalid;
-
+	#endregion 选择相关
+	public class MaterialSelectorPanelPatches {
 
 		[HarmonyPatch(typeof(MaterialSelectionPanel), nameof(MaterialSelectionPanel.SelectSourcesMaterials))]
-		public class SelectSourcesMaterials
-		{
-			public static bool Prefix(MaterialSelectionPanel __instance, Building building)
-			{
-				if (!AutoMaterialMod.Ins.ignoreCopyMaterial) { return true; }
+		public class SelectSourcesMaterials {
+			public static bool Prefix(MaterialSelectionPanel __instance, Building building) {
+				if (!_M.ignoreCopyMaterial) { return true; }
+				_M.copyTags.Clear();
 
-				if (building == null)
-				{
-					copyTag = Tag.Invalid;
+				if (building == null) { return true; }
+				if (_M.isOriginCopy) {
+					_M.ShowTip("OriginCopy");
 					return true;
 				}
 
 				PrimaryElement component1 = building.GetComponent<PrimaryElement>();
 				CellSelectionObject component2 = building.GetComponent<CellSelectionObject>();
+				Constructable component3 = building.GetComponent<Constructable>();
+				Deconstructable component4 = building.GetComponent<Deconstructable>();
 
-				if (component1 != null)
-				{
-					copyTag = component1.Element.tag;
+				if (component1 != null) { _M.AddToCopyTags(component1.Element.tag); }
+				if (component2 != null) {_M.AddToCopyTags(component2.element.tag); }
+				if (component3!=null && component3.SelectedElementsTags != null) {
+					foreach (var v in component3.SelectedElementsTags) {
+						_M.AddToCopyTags(v);
+					}
 				}
-				else if (component2 != null)
-				{
-					copyTag = component2.element.tag;
-				}
-				else
-				{
-					copyTag = Tag.Invalid;
+				if (component4!=null && component4.constructionElements != null) {
+					foreach (var v in component4.constructionElements) {
+						_M.AddToCopyTags(v);
+					}
 				}
 
-				if (copyTag.IsValid)
-				{
+				if (_M.copyTags.Count > 0) {
 					__instance.AutoSelectAvailableMaterial();
-					copyTag = Tag.Invalid;
+					_M.copyTags.Clear();
 					return false;
 				}
 
@@ -378,4 +331,29 @@ namespace AutoMaterial
 			}
 		}
 	}
+
+	#region 按钮相关
+
+	public class PlanScreenPathes {
+		[HarmonyPatch(typeof(PlanScreen), nameof(PlanScreen.ScreenUpdate))]
+		public class OnKeyDown {
+			static void Postfix(PlanScreen __instance) {
+				if (Input.GetKey(KeyCode.LeftShift) && Input.GetKeyDown(KeyCode.A)) {
+					var method = typeof(PlanScreen).GetMethod("OnClickCopyBuilding", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+					if (method != null) {
+						_M.isOriginCopy = true;
+						method.Invoke(__instance, null);
+						_M.isOriginCopy = false;
+					}
+				} else if (Input.GetKey(KeyCode.LeftShift) && Input.GetKeyDown(KeyCode.W)) {
+					_M.curHeadIndex = Math.Min(_M.curHeadIndex + 1, _M.sortHeads.Count - 1);
+					_M.ShowTip("SelectMaterial " + _M.curSortHead);
+				} else if (Input.GetKey(KeyCode.LeftShift) && Input.GetKeyDown(KeyCode.S)) {
+					_M.curHeadIndex = Math.Max(_M.curHeadIndex - 1, 0);
+					_M.ShowTip("SelectMaterial " + _M.curSortHead);
+				}
+			}
+		}
+	}
+	#endregion 按钮相关
 }
