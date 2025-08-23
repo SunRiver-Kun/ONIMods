@@ -16,9 +16,22 @@ namespace AutoMaterial {
 		public static int curHeadIndex = 0;
 		public static List<string> sortHeads = new List<string>();
 		public static string curSortHead => sortHeads[curHeadIndex];
+		public static Dictionary<string, List<string>> hotKeys = new Dictionary<string, List<string>>();
 		public static void AddToCopyTags(Tag tag) {
 			if (!tag.IsValid) { return; }
 			copyTags.Add(tag);
+		}
+
+		public static bool isHotKeyDown(string name) {
+			List<string> keys;
+			if (!hotKeys.TryGetValue(name, out keys) || keys.Count<=0) { return false; }
+
+			foreach (string k in keys) {
+				bool isKeepKey = k.IndexOf("shift") >= 0 || k.IndexOf("ctrl") >= 0 || k.IndexOf("alt") >= 0;
+				bool isInput = isKeepKey ? Input.GetKey(k) : Input.GetKeyDown(k);
+				if(!isInput) { return false; }
+			}
+			return true;
 		}
 
 		public override void OnLoad(Harmony harmony) {
@@ -30,6 +43,15 @@ namespace AutoMaterial {
 
 			foreach (var v in json["sortHeads"]) { sortHeads.Add((string)v); }
 			if (sortHeads.Count == 0) { sortHeads.Add("Common"); }
+
+			foreach (JProperty prop in json["hotKeys"]) {
+				List<string> keys = new List<string>();
+				foreach (var k in prop.Value) {
+					keys.Add((string)k);
+				}
+				hotKeys.Add(prop.Name, keys);
+			}
+
 
 			MaterialSelectorPatches.Init(json);
 			base.OnLoad(harmony);
@@ -174,7 +196,7 @@ namespace AutoMaterial {
 			public static void SelectMaterial(MaterialSelector inst, Recipe recipe, Tag tag) {
 				UISounds.PlaySound(UISounds.Sound.Object_AutoSelected);
 
-				if (_M.copyTags.Count>0 && !_M.copyTags.Contains(tag)) {
+				if (_M.copyTags.Count > 0 && !_M.copyTags.Contains(tag)) {
 					Element element = ElementLoader.GetElement(tag);
 					string str;
 					if (element == null) {
@@ -299,7 +321,7 @@ namespace AutoMaterial {
 
 				if (building == null) { return true; }
 				if (_M.isOriginCopy) {
-					_M.ShowTip("OriginCopy");
+					_M.ShowTip("Copy");
 					return true;
 				}
 
@@ -309,13 +331,13 @@ namespace AutoMaterial {
 				Deconstructable component4 = building.GetComponent<Deconstructable>();
 
 				if (component1 != null) { _M.AddToCopyTags(component1.Element.tag); }
-				if (component2 != null) {_M.AddToCopyTags(component2.element.tag); }
-				if (component3!=null && component3.SelectedElementsTags != null) {
+				if (component2 != null) { _M.AddToCopyTags(component2.element.tag); }
+				if (component3 != null && component3.SelectedElementsTags != null) {
 					foreach (var v in component3.SelectedElementsTags) {
 						_M.AddToCopyTags(v);
 					}
 				}
-				if (component4!=null && component4.constructionElements != null) {
+				if (component4 != null && component4.constructionElements != null) {
 					foreach (var v in component4.constructionElements) {
 						_M.AddToCopyTags(v);
 					}
@@ -338,19 +360,19 @@ namespace AutoMaterial {
 		[HarmonyPatch(typeof(PlanScreen), nameof(PlanScreen.ScreenUpdate))]
 		public class OnKeyDown {
 			static void Postfix(PlanScreen __instance) {
-				if (Input.GetKey(KeyCode.LeftShift) && Input.GetKeyDown(KeyCode.A)) {
+				if (_M.isHotKeyDown("Copy")) {
 					var method = typeof(PlanScreen).GetMethod("OnClickCopyBuilding", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
 					if (method != null) {
 						_M.isOriginCopy = true;
 						method.Invoke(__instance, null);
 						_M.isOriginCopy = false;
 					}
-				} else if (Input.GetKey(KeyCode.LeftShift) && Input.GetKeyDown(KeyCode.W)) {
+				} else if (_M.isHotKeyDown("HeadUp")) {
 					_M.curHeadIndex = Math.Min(_M.curHeadIndex + 1, _M.sortHeads.Count - 1);
-					_M.ShowTip("SelectMaterial " + _M.curSortHead);
-				} else if (Input.GetKey(KeyCode.LeftShift) && Input.GetKeyDown(KeyCode.S)) {
+					_M.ShowTip("AutoMaterial " + _M.curSortHead);
+				} else if (_M.isHotKeyDown("HeadDown")) {
 					_M.curHeadIndex = Math.Max(_M.curHeadIndex - 1, 0);
-					_M.ShowTip("SelectMaterial " + _M.curSortHead);
+					_M.ShowTip("AutoMaterial " + _M.curSortHead);
 				}
 			}
 		}

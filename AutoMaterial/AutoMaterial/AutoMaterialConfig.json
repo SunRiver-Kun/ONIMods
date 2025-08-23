@@ -10,6 +10,11 @@
         { "mass": 400, "buildCount": 4 }
     ],
     "sortHeads": ["Common", "MidTemp", "HighTemp"],
+    "hotKeys" : {
+        "Copy": ["left shift", "a"],
+        "HeadUp": ["left shift", "w"],
+        "HeadDown": ["left shift", "s"]
+    },
     "sortData" : {
         "CommonRock": {
             "materials": ["IgneousRock", "Shale", "SandStone", "Granite", "Obsidian", "SedimentaryRock", "MaficRock", "WoodLog"],
