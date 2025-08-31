@@ -26,18 +26,14 @@
             "materials": ["Granite", "SandStone", "IgneousRock", "Shale", "Obsidian", "SedimentaryRock", "WoodLog"],
             "disableMaterials" : ["Fossil", "Ceramic", "Graphite", "Isoresin", "SuperInsulator"]
         },
-        "InsulationRock": {
-            "materials": ["IgneousRock", "MaficRock", "SuperInsulator", "Ceramic", "Fossil", "Isoresin"],
-            "disableMaterials" : ["SandStone", "Granite", "Graphite", "SedimentaryRock", "Obsidian"]
-        }, 
         "MidTempRock": {
-            "materials": ["IgneousRock", "Obsidian", "MaficRock", "Fossil", "Shale", "SandStone", "Granite", "SedimentaryRock", "WoodLog"],
-            "disableMaterials" : ["Ceramic", "Graphite", "Isoresin", "SuperInsulator", "WoodLog"]
-        }, 
+            "materials": ["MaficRock", "IgneousRock", "Obsidian", "SedimentaryRock"],
+            "disableMaterials" : ["WoodLog", "Shale", "SandStone", "Granite", "Graphite", "Isoresin"]
+        },
         "HighTempRock": {
-            "materials": ["SuperInsulator", "Ceramic", "Obsidian", "IgneousRock", "MaficRock", "Fossil", "Shale", "SandStone", "Granite", "SedimentaryRock"],
-            "disableMaterials" : ["Graphite", "Isoresin", "WoodLog"]
-        }, 
+            "materials": ["Obsidian",  "MaficRock", "IgneousRock", "Fossil"],
+            "disableMaterials" : ["WoodLog", "Shale", "SandStone", "Granite", "Graphite", "Isoresin", "SedimentaryRock"]
+        },
         "CommonOre": {
             "materials": ["Electrum", "Cinnabar", "Cobaltite", "NickelOre", "FoolsGold", "Cuprite", "IronOre", "AluminumOre"],
             "disableMaterials" : ["Steel", "Iridium", "Niobium", "TempConductorSolid"]
@@ -47,16 +43,16 @@
             "disableMaterials" : ["Steel", "Iridium", "Niobium", "TempConductorSolid"]
         }, 
         "ConduitRadiantOre": {
-            "materials": ["Electrum", "Cinnabar", "Cobaltite", "NickelOre", "FoolsGold", "Cuprite", "IronOre", "AluminumOre"],
-            "disableMaterials" : ["Steel", "Iridium", "Niobium", "TempConductorSolid"]
+            "materials": ["Iridium", "Niobium", "Steel", "AluminumOre"],
+            "disableMaterials" : ["Cinnabar", "UraniumOre"]
         }, 
         "MidTempOre": {
-            "materials": ["GoldAmalgam", "Steel", "Iridium", "Niobium"],
-            "disableMaterials" : []
+            "materials": ["GoldAmalgam", "NickelOre", "Cobaltite", "FoolsGold", "IronOre", "AluminumOre", "Wolframite", "Steel" ],
+            "disableMaterials" : ["Cinnabar", "UraniumOre"]
         }, 
         "HighTempOre": {
             "materials": ["Steel", "Iridium", "Niobium", "GoldAmalgam"],
-            "disableMaterials" : []
+            "disableMaterials" : ["Cinnabar", "UraniumOre"]
         },
         "CommonMetal": {
             "materials": ["Cobalt", "Nickel", "Aluminum", "Copper", "Gold", "Iron"],
@@ -104,25 +100,27 @@
         "Ladder": { "buildCount": 50 },
         "FirePole": { "buildCount": 50 },
         "Tile": {"buildCount": 20 },
-        "InsulationTile": { "sort":"InsulationRock", "buildCount": 20 },
+        "InsulationTile": { "sort":"MidTempRock", "buildCount": 10 },
 
-        "Wire": { "sort":"CommonOre", "buildCount": 30 },
-        "HighWattageWire": { "sort":"CommonOre", "buildCount": 30 },
-        "WireRefined": { "sort":"CommonMetal", "buildCount": 30 },
-        "WireRefinedHighWattage": { "sort":"CommonMetal", "buildCount": 30 },
-        "WireBridgeHighWattage": { "sort":"CommonOre", "buildCount": 5 },
+        "Wire": { "buildCount": 30 },
+        "HighWattageWire": {  "buildCount": 30 },
+        "WireRefined": { "buildCount": 30 },
+        "WireRefinedHighWattage": { "buildCount": 30 },
+        "WireBridgeHighWattage": { "buildCount": 5 },
         "PowerTransformerSmall": { "sort":"MidTempOre", "buildCount": 1 },
         "PowerTransformer": { "sort":"MidTempMetal", "buildCount": 1 },
 
         "LiquidConduit": { "buildCount": 30 },
-        "InsulatedLiquidConduit": { "buildCount": 20 },
+        "InsulatedLiquidConduit": { "sort":"MidTempRock", "buildCount": 20 },
         "LiquidConduitRadiant": { "sort":"ConduitRadiantMetal", "buildCount": 5 },
         
         "GasConduitBridge": { "buildCount": 30 },
-        "InsulatedGasConduit": { "buildCount": 20 },
+        "InsulatedGasConduit": { "sort":"MidTempRock", "buildCount": 20 },
         "GasConduitRadiant": { "sort": "ConduitRadiantOre", "buildCount": 5 },
 
         "LiquidConditioner": { "sort":"SuperTempOreAndMetal" },
-        "LiquidHeater": { "sort":"SuperTempOreAndMetal" }
+        "LiquidHeater": { "sort":"SuperTempOreAndMetal" },
+
+        "OilRefinery": { "sort":"MidTempMetal" }
     }
 }
